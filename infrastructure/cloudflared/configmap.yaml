@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-config
+  namespace: default
+data:
+  config.yaml: |
+    tunnel: cea7bbe1-a631-4880-afe9-8bd8d66d1e01
+    credentials-file: /etc/cloudflared/credentials.json
+    ingress:
+      - hostname: aashutoshparajuli.com.np
+        service: http://portfolio-frontend.default.svc.cluster.local:80
+      - hostname: registry.aashutoshparajuli.com.np
+        service: http://zot.default.svc.cluster.local:5000
+      - service: http_status:404
+
