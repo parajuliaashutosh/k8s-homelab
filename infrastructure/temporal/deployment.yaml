@@ -38,7 +38,7 @@ spec:
                   name: temporal-secret
                   key: POSTGRES_PASSWORD
             - name: DYNAMIC_CONFIG_FILE_PATH
-              value: config/dynamicconfig/development-sql.yaml
+              value: /etc/temporal/config/dynamicconfig/development-sql.yaml
           resources:
             requests:
               memory: "256Mi"
