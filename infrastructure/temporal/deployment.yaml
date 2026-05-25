@@ -46,3 +46,10 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "300m"
+          volumeMounts:
+            - name: dynamic-config
+              mountPath: /etc/temporal/config/dynamicconfig
+      volumes:
+        - name: dynamic-config
+          configMap:
+            name: temporal-dynamic-config
