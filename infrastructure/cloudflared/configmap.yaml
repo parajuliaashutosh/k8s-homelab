@@ -9,8 +9,8 @@ data:
     credentials-file: /etc/cloudflared/credentials.json
     ingress:
       - hostname: aashutoshparajuli.com.np
-        service: http://portfolio-frontend.default.svc.cluster.local:80
+        service: http://traefik.kube-system.svc.cluster.local:80
       - hostname: registry.aashutoshparajuli.com.np
-        service: http://zot.default.svc.cluster.local:5000
+        service: http://traefik.kube-system.svc.cluster.local:80
       - service: http_status:404
 

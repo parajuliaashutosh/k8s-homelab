@@ -8,6 +8,16 @@ metadata:
     traefik.ingress.kubernetes.io/router.middlewares: default-security-headers@kubernetescrd
 spec:
   rules:
+    - host: aashutoshparajuli.com.np
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: portfolio-frontend
+                port:
+                  number: 80
     - host: portfolio.local
       http:
         paths:
