@@ -21,12 +21,12 @@ spec:
             - containerPort: 8080
           env:
             - name: TEMPORAL_ADDRESS
-              value: temporal.default.svc.cluster.local:7233
+              value: "temporal.default.svc.cluster.local:7233"
             - name: TEMPORAL_CORS_ORIGINS
-              value: https://temporal.aashutoshparajuli.com.np
+              value: "https://temporal.aashutoshparajuli.com.np"
             - name: TEMPORAL_UI_PORT
-              value: "8080: 
-         resources:
+              value: "8080"
+          resources:
             requests:
               memory: "64Mi"
               cpu: "50m"
