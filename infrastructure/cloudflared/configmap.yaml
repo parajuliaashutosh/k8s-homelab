@@ -14,5 +14,7 @@ data:
         service: http://traefik.kube-system.svc.cluster.local:80
       - hostname: temporal.aashutoshparajuli.com.np
         service: http://traefik.kube-system.svc.cluster.local:80
+      - hostname: pgadmin.aashutoshparajuli.com.np
+        service: http://traefik.kube-system.svc.cluster.local:80      
       - service: http_status:404
 
