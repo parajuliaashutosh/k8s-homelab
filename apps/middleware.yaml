@@ -16,4 +16,3 @@ spec:
       X-NextJs-Prerender: ""
       X-NextJs-Stale-Time: ""
       X-NextJs-Postponed: ""
-      X-Middleware-Test: "true"
