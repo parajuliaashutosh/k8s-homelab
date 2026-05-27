@@ -21,6 +21,11 @@ spec:
           envFrom:
             - secretRef:
                 name: pgadmin-secret
+          env:
+            - name: PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION
+              value: "False"
+            - name: PGADMIN_CONFIG_WTF_CSRF_SSL_STRICT
+              value: "False"
           resources:
             requests:
               memory: "128Mi"
@@ -28,3 +33,4 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "100m"
+
