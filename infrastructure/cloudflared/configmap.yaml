@@ -8,13 +8,15 @@ data:
     tunnel: cea7bbe1-a631-4880-afe9-8bd8d66d1e01
     credentials-file: /etc/cloudflared/credentials.json
     ingress:
+      - hostname: "*.aashutoshparajuli.com.np"
+        service: http://traefik.kube-system.svc.cluster.local:80
       - hostname: aashutoshparajuli.com.np
         service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: registry.aashutoshparajuli.com.np
-        service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: temporal.aashutoshparajuli.com.np
-        service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: pgadmin.aashutoshparajuli.com.np
-        service: http://traefik.kube-system.svc.cluster.local:80      
-      - service: http_status:404
+      # - hostname: registry.aashutoshparajuli.com.np
+      #   service: http://traefik.kube-system.svc.cluster.local:80
+      # - hostname: temporal.aashutoshparajuli.com.np
+      #   service: http://traefik.kube-system.svc.cluster.local:80
+      # - hostname: pgadmin.aashutoshparajuli.com.np
+      #   service: http://traefik.kube-system.svc.cluster.local:80      
+      # - service: http_status:404
 
