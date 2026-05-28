@@ -1,0 +1,8 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: temporal-ui-auth
+  namespace: default
+spec:
+  basicAuth:
+    secret: temporal-ui-auth
