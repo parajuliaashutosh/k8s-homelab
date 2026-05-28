@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: temporal-create-namespace
+  namespace: default
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: temporal-cli
+          image: temporalio/admin-tools:1.24
+          command:
+            - temporal
+            - operator
+            - namespace
+            - create
+            - --namespace
+            - money-order
+            - --address
+            - temporal.default.svc.cluster.local:7233
