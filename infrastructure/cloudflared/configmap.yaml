@@ -8,7 +8,6 @@ data:
     tunnel: cea7bbe1-a631-4880-afe9-8bd8d66d1e01
     credentials-file: /etc/cloudflared/credentials.json
     ingress:
-ingress:
       - hostname: registry.aashutoshparajuli.com.np
         service: http://traefik.kube-system.svc.cluster.local:80
         originRequest:
@@ -20,4 +19,3 @@ ingress:
       - hostname: aashutoshparajuli.com.np
         service: http://traefik.kube-system.svc.cluster.local:80
       - service: http_status:404
-
