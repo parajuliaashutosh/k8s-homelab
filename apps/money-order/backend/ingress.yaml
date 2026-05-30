@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: money-order-backend
+  namespace: default
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: default-security-headers@kubernetescrd
+spec:
+  rules:
+    - host: money-order-be.aashutoshparajuli.com.np
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: money-order-backend
+              port:
+                number: 80
+    - host: money-order.local
+      http:
+        paths:
+        pathType: Prefix
+        backend:
+          service:
+            name: money-order-backend
+            port:
+              number: 80

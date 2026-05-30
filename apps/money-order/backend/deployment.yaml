@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: money-order
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: money-order
+  template:
+    metadata:
+      labels:
+        app: money-order
+    spec:
+      imagePullSecrets:
+        - name: zot-pull-secret
+      containers:
+        - name: money-order
+          image: registry.aashutoshparajuli.com.np/money-order/backend:0.0.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
