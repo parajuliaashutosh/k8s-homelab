@@ -11,19 +11,20 @@ spec:
     - host: money-order-be.aashutoshparajuli.com.np
       http:
         paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: money-order-backend
-              port:
-                number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: money-order-backend
+                port:
+                  number: 80
     - host: money-order.local
       http:
         paths:
-        pathType: Prefix
-        backend:
-          service:
-            name: money-order-backend
-            port:
-              number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: money-order-backend
+                port:
+                  number: 80
