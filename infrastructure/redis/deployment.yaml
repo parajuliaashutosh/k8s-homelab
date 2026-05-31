@@ -46,4 +46,4 @@ spec:
         - name: storage
           hostPath:
             path: /var/lib/infrastructure/redis
-            type: Directory
+            type: DirectoryOrCreate

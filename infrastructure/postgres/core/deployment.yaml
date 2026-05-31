@@ -35,4 +35,4 @@ spec:
         - name: storage
           hostPath:
             path: /var/lib/infrastructure/postgres
-            type: Directory
+            type: DirectoryOrCreate
