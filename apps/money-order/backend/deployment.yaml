@@ -17,7 +17,7 @@ spec:
         - name: zot-pull-secret
       containers:
         - name: money-order
-          image: registry.aashutoshparajuli.com.np/money-order/backend:0.0.4
+          image: registry.aashutoshparajuli.com.np/money-order/backend:0.0.5
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
