@@ -6,3 +6,4 @@ resources:
   - postgres
   - redis
   - temporal
+  - vaultwarden
