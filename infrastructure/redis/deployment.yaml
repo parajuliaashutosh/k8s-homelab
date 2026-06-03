@@ -44,6 +44,5 @@ spec:
               mountPath: /data
       volumes:
         - name: storage
-          hostPath:
-            path: /var/lib/infrastructure/redis
-            type: DirectoryOrCreate
+          persistentVolumeClaim:
+            claimName: redis-pvc
