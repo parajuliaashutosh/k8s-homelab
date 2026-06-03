@@ -1,0 +1,82 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pod-watchdog
+  namespace: monitoring
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: pod-watchdog
+          restartPolicy: Never
+          containers:
+            - name: watchdog
+              image: bitnami/kubectl:latest
+              resources:
+                requests:
+                  memory: "32Mi"
+                  cpu: "10m"
+                limits:
+                  memory: "64Mi"
+                  cpu: "50m"
+              envFrom:
+                - secretRef:
+                    name: pod-watchdog-secret
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  ALERTS=""
+                  NOW=$(date +%s)
+
+                  send_discord() {
+                    curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+                      -H "Content-Type: application/json" \
+                      -d "{\"content\": \"$1\"}"
+                  }
+
+                  # CrashLoopBackOff
+                  CRASH=$(kubectl get pods --all-namespaces \
+                    -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{" "}{range .status.containerStatuses[*]}{.state.waiting.reason}{"\n"}{end}{end}' \
+                    | grep "CrashLoopBackOff" || true)
+                  [ -n "$CRASH" ] && ALERTS="${ALERTS}🔴 CrashLoopBackOff:\n${CRASH}\n\n"
+
+                  # OOMKilled
+                  OOM=$(kubectl get pods --all-namespaces \
+                    -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{" "}{range .status.containerStatuses[*]}{.lastState.terminated.reason}{"\n"}{end}{end}' \
+                    | grep "OOMKilled" || true)
+                  [ -n "$OOM" ] && ALERTS="${ALERTS}💀 OOMKilled:\n${OOM}\n\n"
+
+                  # ImagePullBackOff
+                  IMGPULL=$(kubectl get pods --all-namespaces \
+                    -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{" "}{range .status.containerStatuses[*]}{.state.waiting.reason}{"\n"}{end}{end}' \
+                    | grep "ImagePullBackOff\|ErrImagePull" || true)
+                  [ -n "$IMGPULL" ] && ALERTS="${ALERTS}📦 ImagePullBackOff:\n${IMGPULL}\n\n"
+
+                  # Pending > 2 minutes
+                  PENDING=$(kubectl get pods --all-namespaces \
+                    -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{" "}{.status.phase}{" "}{.metadata.creationTimestamp}{"\n"}{end}' \
+                    | grep "Pending" | while read ns name phase ts; do
+                      POD_TIME=$(date -d "$ts" +%s 2>/dev/null || echo $NOW)
+                      DIFF=$((NOW - POD_TIME))
+                      [ $DIFF -gt 120 ] && echo "$ns $name (pending ${DIFF}s)"
+                    done || true)
+                  [ -n "$PENDING" ] && ALERTS="${ALERTS}🟡 Pending > 2min:\n${PENDING}\n\n"
+
+                  # Node NotReady
+                  NODES=$(kubectl get nodes \
+                    -o jsonpath='{range .items[*]}{.metadata.name}{" "}{range .status.conditions[?(@.type=="Ready")]}{.status}{"\n"}{end}{end}' \
+                    | grep -v "True" || true)
+                  [ -n "$NODES" ] && ALERTS="${ALERTS}🚨 Node NotReady:\n${NODES}\n\n"
+
+                  if [ -n "$ALERTS" ]; then
+                    send_discord "🏠 **k3s Homelab Alert**\n\n${ALERTS}"
+                    echo "Alert sent to Discord"
+                  else
+                    echo "All healthy"
+                  fi
