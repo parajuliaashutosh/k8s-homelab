@@ -42,6 +42,5 @@ spec:
           secret:
             secretName: zot-htpasswd
         - name: storage
-          hostPath:
-            path: /var/lib/infrastructure/registry
-            type: Directory
+          persistentVolumeClaim:
+            claimName: zot-pvc
