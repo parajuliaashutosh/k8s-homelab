@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - middleware.yaml
   - portfolio/frontend
+  - portfolio/chatbot
   - money-order/backend

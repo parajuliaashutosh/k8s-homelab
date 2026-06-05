@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: portfolio
+  name: portfolio-chatbot
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: portfolio
+      app: portfolio-chatbot
   template:
     metadata:
       labels:
-        app: portfolio
+        app: portfolio-chatbot
     spec:
       imagePullSecrets:
         - name: zot-pull-secret
       containers:
-        - name: portfolio
-          image: registry.aashutoshparajuli.com.np/portfolio/frontend:0.1.4
+        - name: portfolio-chatbot
+          image: registry.aashutoshparajuli.com.np/portfolio/chatbot:0.0.1
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
