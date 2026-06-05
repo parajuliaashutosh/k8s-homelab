@@ -23,7 +23,7 @@ spec:
             - containerPort: 8080
           envFrom:
             - secretRef:
-                name: portfolio-chatbot-secret
+                name: chatbot-secret
           resources:
             requests:
               memory: "128Mi"
