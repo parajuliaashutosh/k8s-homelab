@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup-weekly
+  namespace: default
+spec:
+  schedule: "0 6 * * 0"
+  suspend: false
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          imagePullSecrets:
+            - name: zot-pull-secret
+          containers:
+            - name: backup
+              image: registry.aashutoshparajuli.com.np/pg-backup:v1
+              envFrom:
+                - secretRef:
+                    name: postgres-backup-secret
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret
+                      key: POSTGRES_PASSWORD
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  TIMESTAMP=$(date -u +%Y%m%d_%H%M%SZ)
+                  pg_dumpall -h postgres.default.svc.cluster.local -U pgadmin | gzip > /tmp/backup_$TIMESTAMP.sql.gz
+                  if [ $? -eq 0 ]; then
+                    aws s3 cp /tmp/backup_$TIMESTAMP.sql.gz \
+                      s3://$BUCKET_NAME/postgres/weekly/$TIMESTAMP.sql.gz \
+                      --endpoint-url https://$S3_ENDPOINT
+                    curl -s -X POST $WEBHOOK_URL \
+                      -H "Content-Type: application/json" \
+                      -d "{\"content\": \"✅ Postgres weekly backup succeeded: $TIMESTAMP\"}"
+                  else
+                    curl -s -X POST $WEBHOOK_URL \
+                      -H "Content-Type: application/json" \
+                      -d "{\"content\": \"❌ Postgres weekly backup failed!\"}"
+                  fi
