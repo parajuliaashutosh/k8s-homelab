@@ -15,12 +15,19 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: pgvector/pgvector:pg18
+          image: registry.aashutoshparajuli.com.np/pgvector-pgbackrest:pg18
+          imagePullSecrets:
+            - name: zot-pull-secret
           ports:
             - containerPort: 5432
           envFrom:
             - secretRef:
                 name: postgres-secret
+          env:
+            - name: POSTGRESQL_ARCHIVE_MODE
+              value: "on"
+            - name: POSTGRESQL_ARCHIVE_COMMAND
+              value: pgbackrest --stanza=postgres archive-push %p
           resources:
             requests:
               memory: "128Mi"
@@ -31,7 +38,33 @@ spec:
           volumeMounts:
             - name: storage
               mountPath: /var/lib/postgresql
+            - name: pgbackrest-config
+              mountPath: /etc/pgbackrest/pgbackrest.conf
+              subPath: pgbackrest.conf
+        - name: pgbackrest
+          image: registry.aashutoshparajuli.com.np/pgvector-pgbackrest:pg18
+          command: ["/bin/sh", "-c", "while true; do sleep 3600; done"]
+          envFrom:
+            - secretRef:
+                name: postgres-backup-secret
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: storage
+              mountPath: /var/lib/postgresql
+            - name: pgbackrest-config
+              mountPath: /etc/pgbackrest/pgbackrest.conf
+              subPath: pgbackrest.conf
+      imagePullSecrets:
+        - name: zot-pull-secret
       volumes:
         - name: storage
           persistentVolumeClaim:
             claimName: postgres-pvc
+        - name: pgbackrest-config
+          configMap:
+            name: pgbackrest-config
