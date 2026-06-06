@@ -8,3 +8,4 @@ resources:
   - temporal
   - vaultwarden
   - monitoring
+  - flux-receiver
