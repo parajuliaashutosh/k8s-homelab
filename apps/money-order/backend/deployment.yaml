@@ -31,3 +31,17 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "300m"
+        - name: money-order-worker
+          image: registry.aashutoshparajuli.com.np/money-order/backend:0.1.2
+          imagePullPolicy: Always
+          command: ["node", "dist/modules/temporal/worker/worker.js"]
+          envFrom:
+            - secretRef:
+                name: money-order-secret
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
