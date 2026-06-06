@@ -16,4 +16,4 @@ spec:
               service:
                 name: webhook-receiver
                 port:
-                  number: 9292
+                  number: 80
