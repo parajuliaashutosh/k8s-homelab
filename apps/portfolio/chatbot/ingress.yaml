@@ -6,6 +6,7 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
     traefik.ingress.kubernetes.io/router.middlewares: default-security-headers@kubernetescrd
+    traefik.ingress.kubernetes.io/router.transport.responsetransport.flushinterval: "1"
 spec:
   rules:
     - host: chatbot.aashutoshparajuli.com.np

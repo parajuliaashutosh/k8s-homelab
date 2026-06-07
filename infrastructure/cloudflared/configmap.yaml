@@ -14,6 +14,14 @@ data:
           connectTimeout: 30s
           keepAliveTimeout: 90s
           keepAliveConnections: 10
+      - hostname: chatbot.aashutoshparajuli.com.np
+        service: http://traefik.kube-system.svc.cluster.local:80
+        originRequest:
+          disableChunkedEncoding: true
+          connectTimeout: 30s
+          keepAliveTimeout: 90s
+          keepAliveConnections: 10
+          http2Origin: false
       - hostname: "*.aashutoshparajuli.com.np"
         service: http://traefik.kube-system.svc.cluster.local:80
       - hostname: aashutoshparajuli.com.np
