@@ -10,6 +10,7 @@ spec:
   failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
+      activeDeadlineSeconds: 90
       template:
         spec:
           serviceAccountName: pod-watchdog
@@ -35,9 +36,13 @@ spec:
                   NOW=$(date +%s)
 
                   send_discord() {
+                    local raw="$1"
+                    # Use jq to safely encode the message as a JSON string value
+                    local payload
+                    payload=$(jq -cn --arg msg "$raw" '{"content": $msg}')
                     curl -s -X POST "$DISCORD_WEBHOOK_URL" \
                       -H "Content-Type: application/json" \
-                      -d "{\"content\": \"$1\"}"
+                      -d "$payload"
                   }
 
                   # CrashLoopBackOff
@@ -61,21 +66,22 @@ spec:
                   # Pending > 2 minutes
                   PENDING=$(kubectl get pods --all-namespaces \
                     -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{" "}{.status.phase}{" "}{.metadata.creationTimestamp}{"\n"}{end}' \
-                    | grep "Pending" | while read ns name phase ts; do
-                      POD_TIME=$(date -d "$ts" +%s 2>/dev/null || echo $NOW)
+                    | grep " Pending " | while read -r ns name phase ts; do
+                      ts_clean="${ts%Z}"
+                      POD_TIME=$(date -D "%Y-%m-%dT%H:%M:%S" -d "${ts_clean}" +%s 2>/dev/null || echo "$NOW")
                       DIFF=$((NOW - POD_TIME))
-                      [ $DIFF -gt 120 ] && echo "$ns $name (pending ${DIFF}s)"
-                    done || true)
+                      [ "$DIFF" -gt 120 ] && echo "$ns $name (pending ${DIFF}s)"
+                    done)
                   [ -n "$PENDING" ] && ALERTS="${ALERTS}🟡 Pending > 2min:\n${PENDING}\n\n"
 
                   # Node NotReady
                   NODES=$(kubectl get nodes \
                     -o jsonpath='{range .items[*]}{.metadata.name}{" "}{range .status.conditions[?(@.type=="Ready")]}{.status}{"\n"}{end}{end}' \
-                    | grep -v "True" || true)
+                    | grep -v "^$\|True" || true)
                   [ -n "$NODES" ] && ALERTS="${ALERTS}🚨 Node NotReady:\n${NODES}\n\n"
 
                   if [ -n "$ALERTS" ]; then
-                    send_discord "🏠 **k3s Homelab Alert**\n\n${ALERTS}"
+                    send_discord "$(printf '🏠 **k3s Homelab Alert**\n\n%s' "$ALERTS")"
                     echo "Alert sent to Discord"
                   else
                     echo "All healthy"
