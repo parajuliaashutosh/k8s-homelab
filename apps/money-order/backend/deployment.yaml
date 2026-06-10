@@ -17,7 +17,7 @@ spec:
         - name: zot-pull-secret
       containers:
         - name: money-order
-          image: registry.aashutoshparajuli.com.np/money-order/backend:0.1.2
+          image: registry.aashutoshparajuli.com.np/money-order/backend
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -32,7 +32,7 @@ spec:
               memory: "512Mi"
               cpu: "300m"
         - name: money-order-worker
-          image: registry.aashutoshparajuli.com.np/money-order/backend:0.1.2
+          image: registry.aashutoshparajuli.com.np/money-order/backend
           imagePullPolicy: Always
           command: ["node", "dist/modules/temporal/worker/worker.js"]
           envFrom:
