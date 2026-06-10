@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: money-order-migrate
+  namespace: default
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: zot-pull-secret
+      containers:
+        - name: migrate
+          image: registry.aashutoshparajuli.com.np/money-order/backend
+          command: ["node", "dist/migration-runner.js"]
+          envFrom:
+            - secretRef:
+                name: money-order-secret
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
