@@ -4,5 +4,10 @@ metadata:
   name: temporal-ui-auth
   namespace: default
 spec:
-  basicAuth:
-    secret: temporal-ui-auth
+  forwardAuth:
+    address: http://auth-proxy.default.svc.cluster.local/api/authz/check
+    trustForwardHeader: true
+    authResponseHeaders:
+      - X-Auth-User
+      - X-Auth-Email
+      - X-Auth-Role
