@@ -4,5 +4,11 @@ metadata:
   name: pgweb-auth
   namespace: default
 spec:
-  basicAuth:
-    secret: pgweb-auth
+  forwardAuth:
+    address: http://auth-proxy.default.svc.cluster.local/api/authz/check
+    trustForwardHeader: true
+    authResponseHeaders:
+      - X-Auth-User
+      - X-Auth-Email
+      - X-Auth-Role
+
