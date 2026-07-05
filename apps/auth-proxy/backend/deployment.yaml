@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-proxy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-proxy
+  template:
+    metadata:
+      labels:
+        app: auth-proxy
+    spec:
+      imagePullSecrets:
+        - name: zot-pull-secret
+      containers:
+        - name: auth-proxy
+          image: registry.aashutoshparajuli.com.np/auth-management
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: auth-proxy-secret
+          # Migrations run automatically on startup (embedded in the binary),
+          # so no separate migration Job is needed.
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"

@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# NOTE: seed/ is intentionally NOT listed here. Seeding is a one-off — apply it
+# manually (see apps/auth-proxy/README-DEPLOY.md), not on every Flux reconcile.
+resources:
+  - secret.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml

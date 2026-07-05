@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: auth-proxy-seed
+  namespace: default
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: zot-pull-secret
+      containers:
+        - name: seed
+          image: registry.aashutoshparajuli.com.np/auth-management:0.1.0
+          args: ["seed"]
+          envFrom:
+            - secretRef:
+                name: auth-proxy-secret
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "150m"
