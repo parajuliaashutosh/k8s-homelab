@@ -4,3 +4,4 @@ resources:
   - middleware.yaml
   - service.yaml
   - ingress.yaml
+  - helmchart.yaml
