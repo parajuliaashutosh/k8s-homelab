@@ -1,0 +1,17 @@
+# infrastructure/traefik/dashboard-ingressroute.yaml
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dashboard
+  namespace: kube-system
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: traefik.aashutoshparajuli.com.np
+      kind: Rule
+      services:
+        - name: api@internal
+          kind: TraefikService
+      middlewares:
+        - name: traefik-dashboard-auth

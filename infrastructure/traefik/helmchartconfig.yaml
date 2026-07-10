@@ -1,0 +1,12 @@
+# infrastructure/traefik/helmchartconfig.yaml
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    dashboard:
+      enabled: true
+    api:
+      dashboard: true
+      insecure: false
