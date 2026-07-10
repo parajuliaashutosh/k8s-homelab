@@ -6,6 +6,7 @@ resources:
   - postgres
   - redis
   - temporal
+  - traefik-dashboard
   - vaultwarden
   - monitoring
   - flux-receiver
