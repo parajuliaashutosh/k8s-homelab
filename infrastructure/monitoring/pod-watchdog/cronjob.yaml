@@ -32,57 +32,121 @@ spec:
                 - /bin/bash
                 - -c
                 - |
+                  set -euo pipefail
+
                   ALERTS=""
                   NOW=$(date +%s)
 
                   send_discord() {
                     local raw="$1"
-                    # Use jq to safely encode the message as a JSON string value
                     local payload
                     payload=$(jq -cn --arg msg "$raw" '{"content": $msg}')
-                    curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+                    curl -fsSL -X POST "$DISCORD_WEBHOOK_URL" \
                       -H "Content-Type: application/json" \
-                      -d "$payload"
+                      -d "$payload" >/dev/null
                   }
 
-                  # CrashLoopBackOff
-                  CRASH=$(kubectl get pods --all-namespaces \
-                    -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{" "}{range .status.containerStatuses[*]}{.state.waiting.reason}{"\n"}{end}{end}' \
-                    | grep "CrashLoopBackOff" || true)
+                  ###########################################
+                  # CrashLoopBackOff (alert every run)
+                  ###########################################
+                  CRASH=$(
+                    kubectl get pods -A -o json | jq -r '
+                      .items[]
+                      | . as $pod
+                      | .status.containerStatuses[]?
+                      | select(.state.waiting.reason=="CrashLoopBackOff")
+                      | "\($pod.metadata.namespace)/\($pod.metadata.name) container=\(.name)"
+                    '
+                  )
+
                   [ -n "$CRASH" ] && ALERTS="${ALERTS}🔴 CrashLoopBackOff:\n${CRASH}\n\n"
 
-                  # OOMKilled
-                  OOM=$(kubectl get pods --all-namespaces \
-                    -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{" "}{range .status.containerStatuses[*]}{.lastState.terminated.reason}{"\n"}{end}{end}' \
-                    | grep "OOMKilled" || true)
+                  ###########################################
+                  # OOMKilled in last 5 minutes (alert once)
+                  ###########################################
+                  OOM=$(
+                    kubectl get pods -A -o json | jq -r --argjson now "$NOW" '
+                      .items[]
+                      | . as $pod
+                      | .status.containerStatuses[]?
+                      | select(.lastState.terminated.reason=="OOMKilled")
+                      | . as $c
+                      | (
+                          $c.lastState.terminated.finishedAt
+                          | sub("\\.[0-9]+Z$";"Z")
+                          | strptime("%Y-%m-%dT%H:%M:%SZ")
+                          | mktime
+                        ) as $finished
+                      | select(($now - $finished) < 300)
+                      | "\($pod.metadata.namespace)/\($pod.metadata.name)
+                         container=\($c.name)
+                         restarts=\($c.restartCount)
+                         at=\($c.lastState.terminated.finishedAt)"
+                    ' 2>/dev/null
+                  )
+
                   [ -n "$OOM" ] && ALERTS="${ALERTS}💀 OOMKilled:\n${OOM}\n\n"
 
-                  # ImagePullBackOff
-                  IMGPULL=$(kubectl get pods --all-namespaces \
-                    -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{" "}{range .status.containerStatuses[*]}{.state.waiting.reason}{"\n"}{end}{end}' \
-                    | grep "ImagePullBackOff\|ErrImagePull" || true)
-                  [ -n "$IMGPULL" ] && ALERTS="${ALERTS}📦 ImagePullBackOff:\n${IMGPULL}\n\n"
+                  ###########################################
+                  # ImagePullBackOff (alert every run)
+                  ###########################################
+                  IMGPULL=$(
+                    kubectl get pods -A -o json | jq -r '
+                      .items[]
+                      | . as $pod
+                      | .status.containerStatuses[]?
+                      | select(
+                          .state.waiting.reason=="ImagePullBackOff"
+                          or
+                          .state.waiting.reason=="ErrImagePull"
+                      )
+                      | "\($pod.metadata.namespace)/\($pod.metadata.name) container=\(.name) reason=\(.state.waiting.reason)"
+                    '
+                  )
 
-                  # Pending > 2 minutes
-                  PENDING=$(kubectl get pods --all-namespaces \
-                    -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{" "}{.status.phase}{" "}{.metadata.creationTimestamp}{"\n"}{end}' \
-                    | grep " Pending " | while read -r ns name phase ts; do
-                      ts_clean="${ts%Z}"
-                      POD_TIME=$(date -D "%Y-%m-%dT%H:%M:%S" -d "${ts_clean}" +%s 2>/dev/null || echo "$NOW")
-                      DIFF=$((NOW - POD_TIME))
-                      [ "$DIFF" -gt 120 ] && echo "$ns $name (pending ${DIFF}s)"
-                    done)
-                  [ -n "$PENDING" ] && ALERTS="${ALERTS}🟡 Pending > 2min:\n${PENDING}\n\n"
+                  [ -n "$IMGPULL" ] && ALERTS="${ALERTS}📦 Image Pull Issues:\n${IMGPULL}\n\n"
 
-                  # Node NotReady
-                  NODES=$(kubectl get nodes \
-                    -o jsonpath='{range .items[*]}{.metadata.name}{" "}{range .status.conditions[?(@.type=="Ready")]}{.status}{"\n"}{end}{end}' \
-                    | grep -v "^$\|True" || true)
+                  ###########################################
+                  # Pending > 2 minutes (alert every run)
+                  ###########################################
+                  PENDING=$(
+                    kubectl get pods -A -o json | jq -r --argjson now "$NOW" '
+                      .items[]
+                      | select(.status.phase=="Pending")
+                      | (
+                          .metadata.creationTimestamp
+                          | sub("\\.[0-9]+Z$";"Z")
+                          | strptime("%Y-%m-%dT%H:%M:%SZ")
+                          | mktime
+                        ) as $created
+                      | select(($now - $created) > 120)
+                      | "\(.metadata.namespace)/\(.metadata.name) pending \($now-$created)s"
+                    '
+                  )
+
+                  [ -n "$PENDING" ] && ALERTS="${ALERTS}🟡 Pending >2m:\n${PENDING}\n\n"
+
+                  ###########################################
+                  # Node NotReady (alert every run)
+                  ###########################################
+                  NODES=$(
+                    kubectl get nodes -o json | jq -r '
+                      .items[]
+                      | . as $node
+                      | .status.conditions[]
+                      | select(.type=="Ready" and .status!="True")
+                      | "\($node.metadata.name) status=\(.status)"
+                    '
+                  )
+
                   [ -n "$NODES" ] && ALERTS="${ALERTS}🚨 Node NotReady:\n${NODES}\n\n"
 
+                  ###########################################
+                  # Send alert
+                  ###########################################
                   if [ -n "$ALERTS" ]; then
                     send_discord "$(printf '🏠 **k3s Homelab Alert**\n\n%s' "$ALERTS")"
-                    echo "Alert sent to Discord"
+                    echo "Alert sent"
                   else
                     echo "All healthy"
                   fi
