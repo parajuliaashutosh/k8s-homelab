@@ -22,7 +22,7 @@ spec:
         - name: zot-pull-secret
       containers:
         - name: portfolio
-          image: registry.aashutoshparajuli.com.np/portfolio/frontend:0.5.3
+          image: registry.aashutoshparajuli.com.np/portfolio/frontend:0.5.4
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
