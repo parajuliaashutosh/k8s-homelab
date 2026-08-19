@@ -19,3 +19,5 @@ spec:
             - money-order
             - --address
             - temporal.default.svc.cluster.local:7233
+            - --retention
+            - 8760h

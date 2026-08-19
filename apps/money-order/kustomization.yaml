@@ -5,4 +5,4 @@ resources:
   - backend/migrate
 images:
   - name: registry.aashutoshparajuli.com.np/money-order/backend
-    newTag: "2.0.7"
+    newTag: "3.0.1"
