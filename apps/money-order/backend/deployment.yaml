@@ -31,6 +31,13 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "300m"
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 15
         - name: money-order-worker
           image: registry.aashutoshparajuli.com.np/money-order/backend
           imagePullPolicy: Always
