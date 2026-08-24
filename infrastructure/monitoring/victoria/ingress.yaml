@@ -14,4 +14,3 @@ spec:
           port: 8428
       middlewares:
         - name: vmui-dashboard-auth
-          namespace: kube-system
