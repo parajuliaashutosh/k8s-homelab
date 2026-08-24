@@ -15,6 +15,11 @@ spec:
   values:
     remoteWriteUrls:
       - http://vmsingle-victoria-metrics-single-server:8428/api/v1/write
+    rbac:
+      extraRules:
+        - apiGroups: [""]
+          resources: ["nodes/proxy"]
+          verbs: ["get"]
     resources:
       requests: { cpu: 30m, memory: 48Mi }
       limits: { memory: 128Mi }
