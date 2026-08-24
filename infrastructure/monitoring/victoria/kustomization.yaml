@@ -7,3 +7,4 @@ resources:
   - helmrelease-vmagent.yaml
   - configmap-scrape.yaml
   - ingressroute-vmui.yaml
+  - middleware.yaml
