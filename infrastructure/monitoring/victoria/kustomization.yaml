@@ -6,5 +6,5 @@ resources:
   - helmrelease-vmsingle.yaml
   - helmrelease-vmagent.yaml
   - configmap-scrape.yaml
-  - ingressroute-vmui.yaml
+  - ingress.yaml
   - middleware.yaml
