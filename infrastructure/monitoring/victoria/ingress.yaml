@@ -12,3 +12,5 @@ spec:
       services:
         - name: vmsingle-victoria-metrics-single-server
           port: 8428
+      middlewares:
+        - name: vmui-dashboard-auth
