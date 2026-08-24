@@ -345,4 +345,5 @@ traefik:    traefik.kube-system.svc.cluster.local:80
 kubectl get pods -A | grep -v Running | grep -v Completed
 flux get kustomizations
 kubectl get ingress -A
+flux get source git
 ```
