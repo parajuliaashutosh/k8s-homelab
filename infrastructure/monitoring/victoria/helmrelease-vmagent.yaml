@@ -1,0 +1,29 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: vmagent
+  namespace: monitoring
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: victoria-metrics-agent
+      sourceRef:
+        kind: HelmRepository
+        name: victoria-metrics
+        namespace: monitoring
+  values:
+    remoteWriteUrls:
+      - http://vmsingle-victoria-metrics-single-server:8428/api/v1/write
+    resources:
+      requests: { cpu: 30m, memory: 48Mi }
+      limits: { memory: 128Mi }
+    extraArgs:
+      promscrape.config: /etc/vmagent/config/scrape.yaml
+    volumeMounts:
+      - name: scrape-config
+        mountPath: /etc/vmagent/config
+    volumes:
+      - name: scrape-config
+        configMap:
+          name: vmagent-scrape-config

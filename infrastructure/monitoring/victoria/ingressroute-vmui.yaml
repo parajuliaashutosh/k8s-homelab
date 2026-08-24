@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: vmui
+  namespace: monitoring
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`vmui.aashutoshparajuli.com.np`) && PathPrefix(`/vmui`)
+      kind: Rule
+      services:
+        - name: vmsingle-victoria-metrics-single-server
+          port: 8428

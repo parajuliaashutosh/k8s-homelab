@@ -10,3 +10,16 @@ spec:
     api:
       dashboard: true
       insecure: false
+    metrics:
+      prometheus:
+        entryPoint: metrics
+        addEntryPointsLabels: true
+        addRoutersLabels: true
+        addServicesLabels: true
+    entryPoints:
+      metrics:
+        address: ":9100"
+    ports:
+      metrics:
+        port: 9100
+        expose: false
