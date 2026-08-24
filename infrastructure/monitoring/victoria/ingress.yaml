@@ -7,10 +7,11 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`vmui.aashutoshparajuli.com.np`) && PathPrefix(`/vmui`)
+    - match: Host(`vmui.aashutoshparajuli.com.np`)
       kind: Rule
       services:
         - name: vmsingle-victoria-metrics-single-server
           port: 8428
       middlewares:
         - name: vmui-dashboard-auth
+          namespace: kube-system
