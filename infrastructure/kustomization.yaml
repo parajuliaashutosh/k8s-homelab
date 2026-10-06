@@ -7,6 +7,5 @@ resources:
   - redis
   - temporal
   - traefik
-  - vaultwarden
   - monitoring
   - flux-receiver
