@@ -5,3 +5,8 @@ resources:
   - rbac.yaml
   - secret.yaml
   - cronjob.yaml
+configMapGenerator:
+  - name: pod-watchdog-script
+    namespace: monitoring
+    files:
+      - watchdog.sh
