@@ -3,3 +3,8 @@ kind: Kustomization
 resources:
   - cronjob-weekly.yaml
   - secret.yaml
+configMapGenerator:
+  - name: postgres-backup-script
+    namespace: default
+    files:
+      - backup.sh
