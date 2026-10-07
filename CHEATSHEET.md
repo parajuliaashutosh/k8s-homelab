@@ -65,6 +65,9 @@ sudo k3s ctr images list | grep <name>
 
 # Remove image from K3s
 sudo k3s ctr images rm docker.io/library/<image>:<tag>
+
+# Test pull (when we migrate from pull secret to /etc/rancher/k3s/registries.yaml)
+sudo k3s crictl pull registry.aashutoshparajuli.com.np/money-order/backend:3.0.2
 ```
 
 ---
