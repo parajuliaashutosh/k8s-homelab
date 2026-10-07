@@ -2,15 +2,13 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: money-order-migrate
-  namespace: default
+  namespace: money-order
 spec:
   ttlSecondsAfterFinished: 300
   backoffLimit: 2
   template:
     spec:
       restartPolicy: Never
-      imagePullSecrets:
-        - name: zot-pull-secret
       containers:
         - name: migrate
           image: registry.aashutoshparajuli.com.np/money-order/backend

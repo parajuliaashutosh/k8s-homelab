@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: money-order
-  namespace: default
+  namespace: money-order
 spec:
   replicas: 1
   selector:
@@ -13,8 +13,6 @@ spec:
       labels:
         app: money-order
     spec:
-      imagePullSecrets:
-        - name: zot-pull-secret
       containers:
         - name: money-order
           image: registry.aashutoshparajuli.com.np/money-order/backend

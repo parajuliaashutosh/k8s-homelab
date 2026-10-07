@@ -7,8 +7,10 @@ GitOps-managed homelab Kubernetes manifests using Flux and Kustomize.
 - `clusters/homelab/` Flux Kustomizations that reconcile the repo.
   - `apps.yaml` applies everything in `./apps`.
   - `infrastructure.yaml` applies everything in `./infrastructure`.
-- `apps/`
-  - `portfolio/frontend` portfolio frontend deployment + service + ingress.
+- `apps/` each app runs in its own namespace (`auth-proxy`, `portfolio`, `money-order`).
+  - `auth-proxy/backend` auth service, also used by Traefik forwardAuth.
+  - `portfolio/frontend`, `portfolio/chatbot` portfolio frontend and chatbot.
+  - `money-order/backend` money-order API, worker and migration job.
 - `infrastructure/`
   - `cloudflared` Cloudflare Tunnel for public routing.
   - `zot` container registry with UI and basic auth.
@@ -20,7 +22,7 @@ GitOps-managed homelab Kubernetes manifests using Flux and Kustomize.
 - Deployment `portfolio` runs `registry.aashutoshparajuli.com.np/portfolio/frontend:0.0.4` on port 3000.
 - Service `portfolio-frontend` exposes port 80 -> 3000.
 - Ingress host: `portfolio.local`.
-- Pulls images using `zot-pull-secret` in `default` namespace.
+- Runs in the `portfolio` namespace. Registry auth is node-level (see below).
 
 ### Zot registry
 
@@ -43,7 +45,6 @@ GitOps-managed homelab Kubernetes manifests using Flux and Kustomize.
 - Secrets present in `default` namespace:
   - `tunnel-credentials` for Cloudflare Tunnel.
   - `zot-htpasswd` for registry auth.
-  - `zot-pull-secret` for pulling images from the registry.
 
 ### Secret setup
 
@@ -55,13 +56,22 @@ kubectl -n default create secret generic tunnel-credentials \
 
 kubectl -n default create secret generic zot-htpasswd \
   --from-file=htpasswd=/path/to/htpasswd
-
-kubectl -n default create secret docker-registry zot-pull-secret \
-  --docker-server=registry.aashutoshparajuli.com.np \
-  --docker-username=pushuser \
-  --docker-password=YOUR_PASSWORD \
-  --docker-email=you@example.com
 ```
+
+### Registry pull auth
+
+Apps don't use `imagePullSecrets`. Each k3s node logs in to zot itself via
+`/etc/rancher/k3s/registries.yaml` using the read-only `pulluser`:
+
+```yaml
+configs:
+  "registry.aashutoshparajuli.com.np":
+    auth:
+      username: pulluser
+      password: YOUR_PASSWORD
+```
+
+Then restart k3s: `sudo systemctl restart k3s` (or `k3s-agent` on agent nodes).
 
 ## Apply
 

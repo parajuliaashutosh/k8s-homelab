@@ -2,15 +2,13 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: auth-proxy-seed
-  namespace: default
+  namespace: auth-proxy
 spec:
   ttlSecondsAfterFinished: 300
   backoffLimit: 2
   template:
     spec:
       restartPolicy: Never
-      imagePullSecrets:
-        - name: zot-pull-secret
       containers:
         - name: seed
           image: registry.aashutoshparajuli.com.np/auth-management:0.1.0
