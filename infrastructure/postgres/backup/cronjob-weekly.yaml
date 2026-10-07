@@ -11,8 +11,6 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
-          imagePullSecrets:
-            - name: zot-pull-secret
           containers:
             - name: backup
               image: registry.aashutoshparajuli.com.np/pg-backup:v2

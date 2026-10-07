@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: zot-config
-  namespace: default
+  namespace: registry
 data:
   config.json: |
     {
@@ -30,16 +30,20 @@ data:
                   "actions": ["read", "create", "update"]
                 },
                 {
-                  "users": ["pulluser"],
-                  "actions": ["read"]
+                  "users": ["ci-push"],
+                  "actions": ["read", "create"]
                 },
                 {
-                  "users": ["_admin"],
-                  "actions": ["read", "create", "update", "delete"]
+                  "users": ["pulluser"],
+                  "actions": ["read"]
                 }
               ],
               "anonymousPolicy": []
             }
+          },
+          "adminPolicy": {
+            "users": ["_admin"],
+            "actions": ["read", "create", "update", "delete"]
           }
         }
       },
