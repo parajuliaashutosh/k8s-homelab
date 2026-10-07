@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: auth-proxy
-  namespace: default
+  namespace: auth-proxy
 spec:
   replicas: 1
   selector:
@@ -13,8 +13,6 @@ spec:
       labels:
         app: auth-proxy
     spec:
-      imagePullSecrets:
-        - name: zot-pull-secret
       containers:
         - name: auth-proxy
           image: registry.aashutoshparajuli.com.np/auth-management
