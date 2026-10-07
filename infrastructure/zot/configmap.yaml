@@ -30,7 +30,7 @@ data:
                   "actions": ["read", "create", "update"]
                 },
                 {
-                  "users": ["ci-push"],
+                  "users": ["cipush"],
                   "actions": ["read", "create"]
                 },
                 {
