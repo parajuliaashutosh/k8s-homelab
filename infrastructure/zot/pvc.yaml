@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: zot-pvc
-  namespace: default
+  namespace: registry
 spec:
   accessModes:
     - ReadWriteOnce

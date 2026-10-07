@@ -26,17 +26,21 @@ GitOps-managed homelab Kubernetes manifests using Flux and Kustomize.
 
 ### Zot registry
 
-- Deployment `zot` on port 5000 with storage at `/var/lib/infrastructure/registry` (hostPath).
-- Service `zot` exposes port 5000.
+- Runs in the `registry` namespace. Deployment `zot` on port 5000, images stored on the `zot-pvc` (local-path) PVC.
+- Service `zot` exposes port 5000 in the cluster and NodePort 32630 on the node (used for local pushes, bypassing Cloudflare).
 - Ingress host: `registry.local`.
-- Uses `zot-htpasswd` secret for basic auth and `zot-config` for config.
+- Users live in the SOPS-encrypted `zot-htpasswd` secret (`infrastructure/zot/secret.yaml`, bcrypt htpasswd lines):
+  - `_admin` full access via `adminPolicy`.
+  - `pushuser` read/create/update (local pushes, can overwrite tags).
+  - `ci-push` read/create (CI robot, can push new tags but not overwrite or delete).
+  - `pulluser` read only (k3s nodes via `registries.yaml`).
 
 ### Cloudflared
 
 - Deployment `cloudflared` with config from `cloudflared-config`.
 - Routes:
   - `aashutoshparajuli.com.np` -> `portfolio-frontend.default.svc.cluster.local:80`
-  - `registry.aashutoshparajuli.com.np` -> `zot.default.svc.cluster.local:5000`
+  - `registry.aashutoshparajuli.com.np` -> `zot.registry.svc.cluster.local:5000`
 - Uses `tunnel-credentials` secret.
 
 ## Prerequisites
@@ -44,7 +48,6 @@ GitOps-managed homelab Kubernetes manifests using Flux and Kustomize.
 - A Flux installation in the `flux-system` namespace.
 - Secrets present in `default` namespace:
   - `tunnel-credentials` for Cloudflare Tunnel.
-  - `zot-htpasswd` for registry auth.
 
 ### Secret setup
 
@@ -53,9 +56,12 @@ Create the required secrets in the `default` namespace:
 ```bash
 kubectl -n default create secret generic tunnel-credentials \
   --from-file=credentials.json=/path/to/credentials.json
+```
 
-kubectl -n default create secret generic zot-htpasswd \
-  --from-file=htpasswd=/path/to/htpasswd
+To add or change a zot user, generate a bcrypt line and put it in `infrastructure/zot/secret.yaml` with `sops edit`:
+
+```bash
+htpasswd -nbB <user> <password>
 ```
 
 ### Registry pull auth
