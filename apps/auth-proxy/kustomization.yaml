@@ -5,4 +5,4 @@ resources:
   - backend
 images:
   - name: registry.aashutoshparajuli.com.np/auth-management
-    newTag: "0.1.4"
+    newTag: "0.1.5"
