@@ -7,8 +7,9 @@ spec:
   forwardAuth:
     address: http://auth-proxy.auth-proxy.svc.cluster.local/api/authz/check
     trustForwardHeader: true
+    addAuthCookiesToResponse:
+      - access_token
     authResponseHeaders:
       - X-Auth-User
       - X-Auth-Email
       - X-Auth-Role
-
