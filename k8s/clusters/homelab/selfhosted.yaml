@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1h
-  path: ./selfhosted
+  path: ./k8s/selfhosted
   prune: true
   dependsOn:
     - name: infrastructure
