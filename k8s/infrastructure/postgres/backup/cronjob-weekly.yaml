@@ -8,12 +8,14 @@ spec:
   suspend: false
   jobTemplate:
     spec:
+      backoffLimit: 2 # retry 2 times
+      activeDeadlineSeconds: 600
       template:
         spec:
           restartPolicy: OnFailure
           containers:
             - name: backup
-              image: registry.aashutoshparajuli.com.np/pg-backup:v2
+              image: registry.aashutoshparajuli.com.np/pg-backup:v3
               envFrom:
                 - secretRef:
                     name: postgres-backup-secret
