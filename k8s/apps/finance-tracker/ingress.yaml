@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: finance-tracker
+  namespace: finance-tracker
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: default-security-headers@kubernetescrd
+spec:
+  rules:
+    - host: finance.aashutoshparajuli.com.np
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: finance-tracker
+                port:
+                  number: 80
+    - host: finance.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: finance-tracker
+                port:
+                  number: 80

@@ -5,3 +5,4 @@ resources:
   - portfolio
   - money-order
   - auth-proxy
+  - finance-tracker
