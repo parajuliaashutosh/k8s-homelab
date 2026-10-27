@@ -44,6 +44,11 @@ flux reconcile source git flux-system
 flux reconcile kustomization apps
 flux reconcile kustomization infrastructure
 
+# Pull latest from Git and apply in one step
+flux reconcile kustomization apps --with-source
+flux reconcile kustomization infrastructure --with-source
+flux reconcile kustomization selfhosted --with-source
+
 # Check what Flux has applied (inventory)
 kubectl get kustomization apps -n flux-system -o yaml | grep -A30 "inventory"
 
