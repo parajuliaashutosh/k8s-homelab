@@ -6,6 +6,6 @@ resources:
   - postgres
   - redis
   - temporal
-  - traefik
+  # - traefik
   - monitoring
   - flux-receiver
