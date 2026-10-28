@@ -7,4 +7,5 @@ resources:
   - redis
   - temporal
   - monitoring
+  - headlamp
   - flux-receiver
