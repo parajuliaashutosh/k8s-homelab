@@ -8,9 +8,16 @@ spec:
     name: discord
   eventSeverity: info
   eventSources:
+    - kind: GitRepository
+      name: flux-system
     - kind: Kustomization
       name: infrastructure
     - kind: Kustomization
       name: apps
     - kind: Kustomization
       name: selfhosted
+  exclusionList:
+    - "^Dependencies do not meet ready condition.*"
+    - "^Reconciliation finished.*"
+    - "^no changes since last reconcilation.*"
+    - "^garbage collected.*"
