@@ -59,7 +59,7 @@ chmod 700 "$REPORTS_DIR" "$OUT_DIR"
 echo "Reports will be saved to: $OUT_DIR"
 
 # Save the Lynis version used, so audits stay comparable over time
-LYNIS_VERSION="$("$LYNIS_DIR/lynis" show version)"
+LYNIS_VERSION="$(cd "$LYNIS_DIR" && ./lynis show version)"
 echo "$LYNIS_VERSION" > "$OUT_DIR/lynis-version.txt"
 echo "Lynis version: $LYNIS_VERSION"
 
