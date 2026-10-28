@@ -15,7 +15,7 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: backup
-              image: registry.aashutoshparajuli.com.np/pg-backup:v4
+              image: registry.aashutoshparajuli.com.np/pg-backup:v3
               envFrom:
                 - secretRef:
                     name: postgres-backup-secret
