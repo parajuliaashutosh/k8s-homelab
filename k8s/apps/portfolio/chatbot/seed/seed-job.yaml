@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: portfolio-chatbot-seed-admin
+  namespace: portfolio
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: seed-admin
+          image: registry.aashutoshparajuli.com.np/portfolio/chatbot:0.6.0
+          imagePullPolicy: Always
+          command: ["seed-admin"]
+          envFrom:
+            - secretRef:
+                name: chatbot-secret
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"

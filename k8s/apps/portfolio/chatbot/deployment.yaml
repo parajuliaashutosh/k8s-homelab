@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: portfolio-chatbot
-          image: registry.aashutoshparajuli.com.np/portfolio/chatbot:0.5.1
+          image: registry.aashutoshparajuli.com.np/portfolio/chatbot
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -36,3 +36,11 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
             failureThreshold: 15
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
