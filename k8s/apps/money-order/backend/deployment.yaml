@@ -13,6 +13,21 @@ spec:
       labels:
         app: money-order
     spec:
+      initContainers:
+        - name: migrate
+          image: registry.aashutoshparajuli.com.np/money-order/backend
+          imagePullPolicy: Always
+          command: ["node", "dist/migration-runner.js"]
+          envFrom:
+            - secretRef:
+                name: money-order-secret
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
       containers:
         - name: money-order
           image: registry.aashutoshparajuli.com.np/money-order/backend

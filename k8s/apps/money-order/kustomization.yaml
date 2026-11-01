@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - backend
-  - backend/migrate
 images:
   - name: registry.aashutoshparajuli.com.np/money-order/backend
     newTag: "3.0.2"

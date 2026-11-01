@@ -181,6 +181,30 @@ kubectl logs -l app=cloudflared -f
 
 ---
 
+## Headlamp
+
+In-cluster: `headlamp.aashutoshparajuli.com.np` (auth-proxy login, read-only `view` role).
+For full access (restart, edit, delete), run Headlamp locally over Tailscale:
+
+```bash
+# Start (only reachable from this laptop, homelab kubeconfig only, read-only mount)
+docker run -d --name headlamp-homelab \
+  -p 127.0.0.1:4466:4466 \
+  -v "$HOME/.kube/config-homelab:/headlamp/kubeconfig:ro,z" \
+  ghcr.io/headlamp-k8s/headlamp:latest \
+  -kubeconfig /headlamp/kubeconfig
+
+# Open http://localhost:4466
+
+# Stop / start again / logs / remove
+docker stop headlamp-homelab
+docker start headlamp-homelab
+docker logs headlamp-homelab
+docker rm -f headlamp-homelab
+```
+
+---
+
 ## Debugging Strategies
 
 ### Pod stuck in ContainerCreating
