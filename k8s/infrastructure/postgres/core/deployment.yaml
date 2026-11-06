@@ -26,29 +26,13 @@ spec:
           envFrom:
             - secretRef:
                 name: postgres-secret
-          startupProbe:
-            exec:
-              command: ["sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -h 127.0.0.1"]
-            periodSeconds: 10
-            failureThreshold: 30
-          readinessProbe:
-            exec:
-              command: ["sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -h 127.0.0.1"]
-            periodSeconds: 10
-            failureThreshold: 3
-          livenessProbe:
-            exec:
-              command: ["sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -h 127.0.0.1"]
-            periodSeconds: 20
-            timeoutSeconds: 5
-            failureThreshold: 6
           resources:
             requests:
               memory: "256Mi"
               cpu: "100m"
             limits:
               memory: "512Mi"
-              cpu: "200m"
+              cpu: "1000m"
           volumeMounts:
             - name: storage
               mountPath: /var/lib/postgresql
