@@ -13,4 +13,4 @@ spec:
       unsafeUseServiceAccountToken: true
     clusterRoleBinding:
       create: true
-      clusterRoleName: view
+      clusterRoleName: cluster-admin
