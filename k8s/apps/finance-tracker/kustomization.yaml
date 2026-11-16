@@ -8,4 +8,4 @@ resources:
   - ingress.yaml
 images:
   - name: registry.aashutoshparajuli.com.np/finance-tracker
-    newTag: "0.0.1"
+    newTag: "0.0.2"
